@@ -1,5 +1,6 @@
 import React from 'react';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import axios from 'axios';
 import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -9,6 +10,12 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Typography from '@material-ui/core/Typography';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -31,19 +38,72 @@ const useStyles = makeStyles((theme: Theme) =>
     currencyType: {
       minWidth: "30%",
     },
+    table: {
+      minWidth: 650,
+    },
   }),
 );
 
+
+type TCoin = {
+  name: string;
+  fullName: string;
+  imageUrl: string;
+  price: number;
+  volume24hour: number;
+}
+
+
 function App() {
   const classes = useStyles();
+  let [allCoins, setAllCoins] = React.useState<TCoin[]>([]);
+
+  React.useEffect(() => {
+    axios
+      .get("https://min-api.cryptocompare.com/data/top/totalvolfull?limit=10&tsym=USD")
+      .then(({ data }) => {
+        const coins: TCoin[] = data.Data.map((coin: any) => {
+          const obj: TCoin = {
+            name: coin.CoinInfo.Name,
+            fullName: coin.CoinInfo.fullName,
+            imageUrl: `https://www.cryptocompare.com/${coin.CoinInfo.ImageUrl}`,
+            price: coin.RAW.USD.PRICE,
+            volume24hour: coin.RAW.USD.VOLUME24HOUR,
+          };
+          return obj;
+        });
+        setAllCoins(coins);
+      });
+  }, [classes])
 
   return (
     <Container className={classes.root} maxWidth="lg">
       <Grid container spacing={3}>
         <Grid item xs={8}>
-          <Paper className={classes.paper}>
-
-          </Paper>
+          <TableContainer component={Paper}>
+            <Table className={classes.table} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell align="left">FullName</TableCell>
+                  <TableCell align="left">Name</TableCell>
+                  <TableCell align="left">Price</TableCell>
+                  <TableCell align="left">volume24hour</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {allCoins.map((row) => (
+                  <TableRow key={row.name}>
+                    <TableCell>123</TableCell>
+                    <TableCell align="left">{row.calories}</TableCell>
+                    <TableCell align="left">{row.fat}</TableCell>
+                    <TableCell align="left">{row.carbs}</TableCell>
+                    <TableCell align="left">{row.protein}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Grid>
         <Grid item xs={4}>
           <Paper className={classes.paper}>
