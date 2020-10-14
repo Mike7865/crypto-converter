@@ -41,6 +41,11 @@ const useStyles = makeStyles((theme: Theme) =>
     table: {
       minWidth: 650,
     },
+    currencyIcon: {
+      width: 18,
+      height: 18,
+      borderRadius: 30,
+    }
   }),
 );
 
@@ -65,10 +70,10 @@ function App() {
         const coins: TCoin[] = data.Data.map((coin: any) => {
           const obj: TCoin = {
             name: coin.CoinInfo.Name,
-            fullName: coin.CoinInfo.fullName,
+            fullName: coin.CoinInfo.FullName,
             imageUrl: `https://www.cryptocompare.com/${coin.CoinInfo.ImageUrl}`,
-            price: coin.RAW.USD.PRICE,
-            volume24hour: coin.RAW.USD.VOLUME24HOUR,
+            price: coin.RAW.USD.PRICE.toFixed(3),
+            volume24hour: parseInt(coin.RAW.USD.VOLUME24HOUR),
           };
           return obj;
         });
@@ -85,20 +90,20 @@ function App() {
               <TableHead>
                 <TableRow>
                   <TableCell></TableCell>
-                  <TableCell align="left">FullName</TableCell>
                   <TableCell align="left">Name</TableCell>
+                  <TableCell align="left">FullName</TableCell>
                   <TableCell align="left">Price</TableCell>
                   <TableCell align="left">volume24hour</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {allCoins.map((row) => (
-                  <TableRow key={row.name}>
-                    <TableCell>123</TableCell>
-                    <TableCell align="left">{row.calories}</TableCell>
-                    <TableCell align="left">{row.fat}</TableCell>
-                    <TableCell align="left">{row.carbs}</TableCell>
-                    <TableCell align="left">{row.protein}</TableCell>
+                {allCoins.map(coin => (
+                  <TableRow key={coin.name}>
+                    <TableCell><img className={classes.currencyIcon} src={coin.imageUrl} alt="Coin icon" /></TableCell>
+                    <TableCell align="left">{coin.name}</TableCell>
+                    <TableCell align="left">{coin.fullName}</TableCell>
+                    <TableCell align="left">${coin.price}</TableCell>
+                    <TableCell align="left">${coin.volume24hour}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
